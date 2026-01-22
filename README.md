@@ -30,3 +30,17 @@ cc
 ## Requirements
 - Go installed
 - [Claude Code CLI](https://github.com/anthropics/claude-code) installed and authenticated
+
+## Development & Releasing
+
+To create a new release (build binaries, generate changelog, and upload to GitHub):
+
+1. Ensure you have the GitHub CLI installed: `brew install gh`
+2. Run the release script:
+```bash
+./release.sh v1.0.1
+```
+Or with custom notes:
+```bash
+./release.sh v1.0.1 "Major performance improvements"
+```
