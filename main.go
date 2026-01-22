@@ -36,8 +36,8 @@ func main() {
 	result = strings.TrimSpace(result)
 
 	// 3. Check for issues
-	if strings.HasPrefix(result, "ISSUE:") {
-		fmt.Println("\n⚠️  Claude found issues in your code:")
+	if strings.HasPrefix(strings.ToUpper(result), "ISSUE:") {
+		fmt.Println("\n⚠️  Claude found potential issues in your code:")
 		fmt.Println(result)
 		fmt.Println("\nPlease fix these issues before committing.")
 		os.Exit(1)

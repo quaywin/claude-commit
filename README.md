@@ -1,4 +1,4 @@
-# Claude Commit CLI
+# cc (Claude Commit)
 
 A CLI tool that uses Claude Code (Haiku) to review your code changes, generate commit messages, and push to your repository.
 
@@ -8,17 +8,25 @@ A CLI tool that uses Claude Code (Haiku) to review your code changes, generate c
 - **One-Step Workflow**: Handles `git add`, `git commit`, and `git push` in one go.
 
 ## Installation
+
+### Via Curl (Recommended)
 ```bash
+curl -fsSL https://raw.githubusercontent.com/quaywin/claude-commit/main/install.sh | bash
+```
+
+### From Source
+```bash
+git clone https://github.com/quaywin/claude-commit.git
+cd claude-commit
 ./install.sh
 ```
 
 ## Usage
 Run the following command in any git repository:
 ```bash
-claude-commit
+cc
 ```
 
 ## Requirements
 - Go installed
 - [Claude Code CLI](https://github.com/anthropics/claude-code) installed and authenticated
-New change
