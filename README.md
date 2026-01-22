@@ -21,3 +21,4 @@ claude-commit
 ## Requirements
 - Go installed
 - [Claude Code CLI](https://github.com/anthropics/claude-code) installed and authenticated
+New change
