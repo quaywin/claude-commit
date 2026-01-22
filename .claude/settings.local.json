@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(brew install:*)",
+      "Bash(go mod init:*)",
+      "Bash(go mod tidy)",
+      "Bash(/Users/quaywin/.local/bin/claude:*)",
+      "Bash(go build:*)",
+      "Bash(./claude-commit:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/quaywin/claude-commit/internal/claude"
+	"github.com/quaywin/claude-commit/internal/git"
+)
+
+func main() {
+	fmt.Println("🔍 Checking for changes...")
+
+	// 1. Get diff
+	diff, err := git.GetDiff()
+	if err != nil {
+		fmt.Printf("❌ Error getting git diff: %v\n", err)
+		os.Exit(1)
+	}
+
+	if diff == "" {
+		fmt.Println("✅ No changes to commit.")
+		return
+	}
+
+	// 2. Call Claude for review and commit message
+	fmt.Println("🤖 Claude is reviewing your changes...")
+	result, err := claude.ReviewAndCommitMessage(diff)
+	if err != nil {
+		fmt.Printf("❌ Error calling Claude: %v\n", err)
+		os.Exit(1)
+	}
+
+	result = strings.TrimSpace(result)
+
+	// 3. Check for issues
+	if strings.HasPrefix(result, "ISSUE:") {
+		fmt.Println("\n⚠️  Claude found issues in your code:")
+		fmt.Println(result)
+		fmt.Println("\nPlease fix these issues before committing.")
+		os.Exit(1)
+	}
+
+	// 4. Confirm commit message
+	fmt.Printf("\n📝 Suggested commit message:\n%s\n", result)
+	fmt.Print("\nDo you want to commit and push? (y/n): ")
+
+	reader := bufio.NewReader(os.Stdin)
+	answer, _ := reader.ReadString('\n')
+	answer = strings.ToLower(strings.TrimSpace(answer))
+
+	if answer != "y" && answer != "yes" {
+		fmt.Println("🚫 Commit cancelled.")
+		return
+	}
+
+	// 5. Stage, Commit, and Push
+	fmt.Println("🚀 Staging all changes...")
+	if err := git.StageAll(); err != nil {
+		fmt.Printf("❌ Error staging changes: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("💾 Committing...")
+	if err := git.Commit(result); err != nil {
+		fmt.Printf("❌ Error committing: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("📤 Pushing...")
+	if err := git.Push(); err != nil {
+		fmt.Printf("❌ Error pushing: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("\n✨ Done! Your changes have been reviewed, committed, and pushed.")
+}
