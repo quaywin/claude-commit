@@ -43,18 +43,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// 4. Confirm commit message
-	fmt.Printf("\n📝 Suggested commit message:\n%s\n", result)
-	fmt.Print("\nDo you want to commit and push? (y/n): ")
-
-	reader := bufio.NewReader(os.Stdin)
-	answer, _ := reader.ReadString('\n')
-	answer = strings.ToLower(strings.TrimSpace(answer))
-
-	if answer != "y" && answer != "yes" {
-		fmt.Println("🚫 Commit cancelled.")
-		return
-	}
+	// 4. Show commit message
+	fmt.Printf("\n📝 Commit message: %s\n", result)
 
 	// 5. Stage, Commit, and Push
 	fmt.Println("🚀 Staging all changes...")
