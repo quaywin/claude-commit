@@ -1,0 +1,17 @@
+# Binaries
+cc
+dist/
+claude-commit
+
+# Go
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
