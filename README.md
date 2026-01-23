@@ -30,8 +30,8 @@ cc
 ```
 
 ## Requirements
-- Go installed
 - [Claude Code CLI](https://github.com/anthropics/claude-code) installed and authenticated
+- (Optional) [Go](https://go.dev/) (only if building from source)
 
 ## Development & Releasing
 
