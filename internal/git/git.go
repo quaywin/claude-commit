@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const FileSummaryThreshold = 10
+
 // GetDiff returns the combined diff of staged and unstaged changes
 func GetDiff() (string, error) {
 	// Get unstaged changes
@@ -17,6 +19,27 @@ func GetDiff() (string, error) {
 
 	// Get staged changes
 	staged, err := runGitCommand("diff", "--cached")
+	if err != nil {
+		return "", err
+	}
+
+	if unstaged == "" && staged == "" {
+		return "", nil
+	}
+
+	return fmt.Sprintf("--- UNSTAGED CHANGES ---\n%s\n--- STAGED CHANGES ---\n%s", unstaged, staged), nil
+}
+
+// GetDiffSummary returns a summary of changed files with line counts (for large changesets)
+func GetDiffSummary() (string, error) {
+	// Get unstaged changes summary
+	unstaged, err := runGitCommand("diff", "--stat")
+	if err != nil {
+		return "", err
+	}
+
+	// Get staged changes summary
+	staged, err := runGitCommand("diff", "--cached", "--stat")
 	if err != nil {
 		return "", err
 	}

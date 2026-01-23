@@ -55,11 +55,35 @@ func main() {
 
 	fmt.Println("🔍 Checking for changes...")
 
-	// 1. Get diff
-	diff, err := git.GetDiff()
+	// 1. Get changed files and determine mode
+	changedFiles, err := git.GetChangedFiles()
 	if err != nil {
-		fmt.Printf("❌ Error getting git diff: %v\n", err)
+		fmt.Printf("❌ Error getting changed files: %v\n", err)
 		os.Exit(1)
+	}
+
+	if len(changedFiles) == 0 {
+		fmt.Println("✅ No changes to commit.")
+		return
+	}
+
+	fileCount := len(changedFiles)
+	useSummaryMode := fileCount >= git.FileSummaryThreshold
+
+	// 2. Get appropriate diff
+	var diff string
+	if useSummaryMode {
+		diff, err = git.GetDiffSummary()
+		if err != nil {
+			fmt.Printf("❌ Error getting git diff summary: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		diff, err = git.GetDiff()
+		if err != nil {
+			fmt.Printf("❌ Error getting git diff: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	if diff == "" {
@@ -67,14 +91,7 @@ func main() {
 		return
 	}
 
-	// Get list of changed files
-	changedFiles, err := git.GetChangedFiles()
-	if err != nil {
-		fmt.Printf("❌ Error getting changed files: %v\n", err)
-		os.Exit(1)
-	}
-
-	// 2. Call Claude for review and commit message
+	// 3. Call Claude for review and commit message
 	fmt.Print("🤖 Claude is reviewing your changes")
 
 	// Start spinner animation
@@ -87,8 +104,12 @@ func main() {
 		i := 0
 
 		fileCountText := ""
-		if len(changedFiles) > 0 {
-			fileCountText = fmt.Sprintf(" (%d files)", len(changedFiles))
+		if fileCount > 0 {
+			modeText := ""
+			if useSummaryMode {
+				modeText = ", summary mode"
+			}
+			fileCountText = fmt.Sprintf(" (%d files%s)", fileCount, modeText)
 		}
 
 		for {
@@ -108,7 +129,7 @@ func main() {
 		}
 	}()
 
-	result, err := claude.ReviewAndCommitMessage(diff, cfg.Model, nil)
+	result, err := claude.ReviewAndCommitMessage(diff, cfg.Model, useSummaryMode, nil)
 
 	// Stop spinner
 	stopSpinner <- true

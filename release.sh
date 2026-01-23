@@ -67,25 +67,7 @@ cd dist
 shasum -a 256 cc-* > checksums.txt
 cd ..
 
-# 2. Update README.md version
-echo "📝 Updating README.md to version $VERSION..."
-# Use sed to replace the line starting with **Current Version:**
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS requires an empty string for the -i flag
-    sed -i '' "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
-else
-    sed -i "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
-fi
-
-# 3. Update VERSION constant in main.go
-echo "📝 Updating VERSION in main.go to $VERSION..."
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' "s/const VERSION = \".*\"/const VERSION = \"$VERSION\"/" main.go
-else
-    sed -i "s/const VERSION = \".*\"/const VERSION = \"$VERSION\"/" main.go
-fi
-
-# 4. Generate Changelog
+# 2. Generate Changelog
 echo "📝 Generating changelog..."
 if git describe --tags --abbrev=0 >/dev/null 2>&1; then
     LAST_TAG=$(git describe --tags --abbrev=0)
