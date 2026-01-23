@@ -1,18 +1,11 @@
 #!/bin/bash
 
 # release.sh - Automated build and release script for cc
-# Usage: ./release.sh v1.0.1 "Optional custom notes"
+# Usage: ./release.sh [version-tag] [notes]
+# If version-tag is omitted, it automatically increments the patch version.
 
 set -e
 
-if [ -z "$1" ]; then
-    echo "Usage: $0 <version-tag> [notes]"
-    echo "Example: $0 v1.0.1"
-    exit 1
-fi
-
-VERSION="$1"
-CUSTOM_NOTES="$2"
 APP_NAME="cc"
 PLATFORMS=("darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
 
@@ -22,6 +15,33 @@ if ! command -v gh &> /dev/null; then
     echo "Please install it: brew install gh"
     exit 1
 fi
+
+# Determine version
+if [ -z "$1" ]; then
+    echo "🔍 No version provided. Detecting latest tag..."
+    if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+        LAST_TAG=$(git describe --tags --abbrev=0)
+        echo "Last tag found: $LAST_TAG"
+
+        # Strip 'v' if present
+        VERSION_PART=${LAST_TAG#v}
+
+        # Split by dot
+        IFS='.' read -r major minor patch <<< "$VERSION_PART"
+
+        # Increment patch
+        NEW_PATCH=$((patch + 1))
+        VERSION="v$major.$minor.$NEW_PATCH"
+        echo "🚀 Auto-incremented to $VERSION"
+    else
+        echo "❌ No tags found. Please provide a version (e.g., ./release.sh v1.0.0)"
+        exit 1
+    fi
+else
+    VERSION="$1"
+fi
+
+CUSTOM_NOTES="$2"
 
 # 1. Build Binaries
 echo "📦 Building releases for $VERSION..."

@@ -7,6 +7,7 @@ A CLI tool that uses Claude Code (Haiku) to review your code changes, generate c
 ## Features
 - **Automated Review**: Uses Claude Haiku to find bugs and security risks before you commit.
 - **Auto-Commit Messages**: Generates professional commit messages based on your diff.
+- **Clean History**: Automatically forbids Claude from adding "Co-Authored-By" or other attribution trailers to your commits.
 - **One-Step Workflow**: Handles `git add`, `git commit`, and `git push` in one go.
 
 ## Installation
