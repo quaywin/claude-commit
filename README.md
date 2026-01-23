@@ -7,6 +7,7 @@ A CLI tool that uses Claude Code (Haiku) to review your code changes, generate c
 ## Features
 - **Automated Review**: Uses Claude Haiku to find bugs and security risks before you commit.
 - **Auto-Commit Messages**: Generates professional commit messages based on your diff.
+- **Untracked File Support**: Automatically detects and includes new, untracked files in the review and commit.
 - **Clean History**: Automatically forbids Claude from adding "Co-Authored-By" or other attribution trailers to your commits.
 - **One-Step Workflow**: Handles `git add`, `git commit`, and `git push` in one go.
 - **Plan Mode**: Optional confirmation mode to review before committing.
@@ -40,6 +41,14 @@ Automatically reviews, generates commit message, and pushes without confirmation
 cc plan
 ```
 Shows the commit message and asks for your confirmation before committing and pushing.
+
+**Force commit (bypass warnings):**
+```bash
+cc --force
+# or
+cc -f
+```
+Proceeds with the commit and push even if Claude identifies potential issues in your code.
 
 #### Quick Mode Example:
 ```
