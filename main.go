@@ -20,7 +20,7 @@ import (
 	"github.com/quaywin/claude-commit/internal/git"
 )
 
-const VERSION = "v1.0.2"
+const VERSION = "v1.0.3"
 
 func main() {
 	// Handle version command
@@ -52,6 +52,13 @@ func main() {
 		return
 	}
 
+	// Get list of changed files
+	changedFiles, err := git.GetChangedFiles()
+	if err != nil {
+		fmt.Printf("❌ Error getting changed files: %v\n", err)
+		os.Exit(1)
+	}
+
 	// 2. Call Claude for review and commit message
 	fmt.Print("🤖 Claude is reviewing your changes")
 
@@ -63,14 +70,29 @@ func main() {
 		defer wg.Done()
 		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 		i := 0
+		fileIndex := 0
 		for {
 			select {
 			case <-stopSpinner:
 				fmt.Print("\r🤖 Claude is reviewing your changes... ✅\n")
 				return
 			default:
-				fmt.Printf("\r🤖 Claude is reviewing your changes %s ", spinner[i%len(spinner)])
+				currentFile := ""
+				fileCount := ""
+				if len(changedFiles) > 0 {
+					currentFileIndex := fileIndex % len(changedFiles)
+					currentFile = fmt.Sprintf(" [%s]", changedFiles[currentFileIndex])
+					fileCount = fmt.Sprintf(" (%d/%d files)", currentFileIndex+1, len(changedFiles))
+				}
+				fmt.Printf("\r🤖 Claude is reviewing your changes %s%s%s ", spinner[i%len(spinner)], currentFile, fileCount)
+
+				// Clear to end of line to handle varying file name lengths
+				fmt.Print("\033[K")
+
 				i++
+				if i%3 == 0 { // Change file every 3 spinner frames
+					fileIndex++
+				}
 				time.Sleep(100 * time.Millisecond)
 			}
 		}

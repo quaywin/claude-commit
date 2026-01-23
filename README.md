@@ -1,6 +1,6 @@
 # cc (Claude Commit)
 
-**Current Version:** v1.0.2
+**Current Version:** v1.0.3
 
 A CLI tool that uses Claude Code (Haiku) to review your code changes, generate commit messages, and push to your repository.
 
@@ -44,9 +44,9 @@ Shows the commit message and asks for your confirmation before committing and pu
 #### Quick Mode Example:
 ```
 🔍 Checking for changes...
-🤖 Claude is reviewing your changes ⠋
+🤖 Claude is reviewing your changes ⠋ [main.go] (1/3 files)
 ```
-(Animated spinner while Claude analyzes your code)
+(Animated spinner cycling through each changed file with progress counter)
 ```
 🤖 Claude is reviewing your changes... ✅
 
@@ -62,9 +62,9 @@ Shows the commit message and asks for your confirmation before committing and pu
 #### Plan Mode Example:
 ```
 🔍 Checking for changes...
-🤖 Claude is reviewing your changes ⠋
+🤖 Claude is reviewing your changes ⠋ [main.go] (1/3 files)
 ```
-(Animated spinner while Claude analyzes your code)
+(Animated spinner cycling through each changed file with progress counter)
 ```
 🤖 Claude is reviewing your changes... ✅
 

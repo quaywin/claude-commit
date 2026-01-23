@@ -28,6 +28,41 @@ func GetDiff() (string, error) {
 	return fmt.Sprintf("--- UNSTAGED CHANGES ---\n%s\n--- STAGED CHANGES ---\n%s", unstaged, staged), nil
 }
 
+// GetChangedFiles returns a list of files that have been changed (staged and unstaged)
+func GetChangedFiles() ([]string, error) {
+	// Get unstaged files
+	unstaged, err := runGitCommand("diff", "--name-only")
+	if err != nil {
+		return nil, err
+	}
+
+	// Get staged files
+	staged, err := runGitCommand("diff", "--cached", "--name-only")
+	if err != nil {
+		return nil, err
+	}
+
+	// Combine and deduplicate
+	filesMap := make(map[string]bool)
+	for _, file := range strings.Split(unstaged, "\n") {
+		if file != "" {
+			filesMap[file] = true
+		}
+	}
+	for _, file := range strings.Split(staged, "\n") {
+		if file != "" {
+			filesMap[file] = true
+		}
+	}
+
+	var files []string
+	for file := range filesMap {
+		files = append(files, file)
+	}
+
+	return files, nil
+}
+
 // StageAll stages all changes in the repository
 func StageAll() error {
 	_, err := runGitCommand("add", ".")
