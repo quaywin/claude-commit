@@ -46,12 +46,6 @@ else
     sed -i "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
 fi
 
-# 3. Commit README.md change
-echo "💾 Committing README.md update..."
-git add README.md
-git commit -m "chore: update version to $VERSION in README.md" || echo "⚠️ README.md version already up to date"
-git push origin main
-
 # 4. Generate Changelog
 echo "📝 Generating changelog..."
 if git describe --tags --abbrev=0 >/dev/null 2>&1; then
