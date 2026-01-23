@@ -29,6 +29,7 @@ start your response with "ISSUE: " followed by the concern.
 
 Otherwise, provide a concise commit message following Conventional Commits specification.
 Focus on the "why" and overall scope, not individual file details.
+Provide ONLY the commit message in one line. Do NOT include any "Co-Authored-By" trailers or attribution.
 
 Diff Summary:
 %s`, diff)
