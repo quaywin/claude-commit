@@ -153,8 +153,21 @@ func Commit(message string) error {
 
 // Push pushes the current branch to the remote
 func Push() error {
+	// Try regular push first
 	_, err := runGitCommand("push")
-	return err
+	if err != nil {
+		// If it fails because of missing upstream, try to set it
+		if strings.Contains(err.Error(), "has no upstream branch") {
+			branch, branchErr := runGitCommand("rev-parse", "--abbrev-ref", "HEAD")
+			if branchErr != nil {
+				return err // Return original error if we can't even get branch name
+			}
+			_, pushErr := runGitCommand("push", "--set-upstream", "origin", branch)
+			return pushErr
+		}
+		return err
+	}
+	return nil
 }
 
 func runGitCommand(args ...string) (string, error) {
