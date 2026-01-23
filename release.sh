@@ -36,7 +36,23 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUT_NAME" main.go
 done
 
-# 2. Generate Changelog
+# 2. Update README.md version
+echo "📝 Updating README.md to version $VERSION..."
+# Use sed to replace the line starting with **Current Version:**
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS requires an empty string for the -i flag
+    sed -i '' "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
+else
+    sed -i "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
+fi
+
+# 3. Commit README.md change
+echo "💾 Committing README.md update..."
+git add README.md
+git commit -m "chore: update version to $VERSION in README.md" || echo "⚠️ README.md version already up to date"
+git push origin main
+
+# 4. Generate Changelog
 echo "📝 Generating changelog..."
 if git describe --tags --abbrev=0 >/dev/null 2>&1; then
     LAST_TAG=$(git describe --tags --abbrev=0)
