@@ -85,27 +85,24 @@ func main() {
 		defer wg.Done()
 		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 		i := 0
-		fileIndex := 0
+
+		fileCountText := ""
+		if len(changedFiles) > 0 {
+			fileCountText = fmt.Sprintf(" (%d files)", len(changedFiles))
+		}
+
 		for {
 			select {
 			case <-stopSpinner:
 				fmt.Print("\r🤖 Claude is reviewing your changes... ✅\n")
 				return
 			default:
-				currentFile := ""
-				if len(changedFiles) > 0 {
-					currentFileIndex := fileIndex % len(changedFiles)
-					currentFile = fmt.Sprintf(" [%s]", changedFiles[currentFileIndex])
-				}
-				fmt.Printf("\r🤖 Claude is reviewing your changes %s%s ", spinner[i%len(spinner)], currentFile)
+				fmt.Printf("\r🤖 Claude is reviewing your changes%s %s ", fileCountText, spinner[i%len(spinner)])
 
-				// Clear to end of line to handle varying file name lengths
+				// Clear to end of line
 				fmt.Print("\033[K")
 
 				i++
-				if i%3 == 0 { // Change file every 3 spinner frames
-					fileIndex++
-				}
 				time.Sleep(100 * time.Millisecond)
 			}
 		}
