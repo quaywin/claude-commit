@@ -14,7 +14,7 @@ func ReviewAndCommitMessage(diff string) (string, error) {
 
 	prompt := fmt.Sprintf(`Review the following git diff for any issues (bugs, security risks, style).
 If there are critical issues, you MUST start your response with "ISSUE: " followed by the description.
-If the code looks good, provide ONLY a concise, professional commit message in one line.
+If the code looks good, provide ONLY a concise, professional commit message in one line. Do NOT include any "Co-Authored-By" trailers or attribution.
 
 Diff:
 %s`, diff)
