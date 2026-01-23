@@ -1,6 +1,6 @@
 # cc (Claude Commit)
 
-**Current Version:** v1.0.4
+**Current Version:** v1.0.5
 
 A CLI tool that uses Claude Code (Haiku) to review your code changes, generate commit messages, and push to your repository.
 

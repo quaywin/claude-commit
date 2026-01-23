@@ -22,7 +22,7 @@ import (
 	"github.com/quaywin/claude-commit/internal/git"
 )
 
-const VERSION = "v1.0.4"
+const VERSION = "v1.0.5"
 
 func main() {
 	// Load config
@@ -93,13 +93,11 @@ func main() {
 				return
 			default:
 				currentFile := ""
-				fileCount := ""
 				if len(changedFiles) > 0 {
 					currentFileIndex := fileIndex % len(changedFiles)
 					currentFile = fmt.Sprintf(" [%s]", changedFiles[currentFileIndex])
-					fileCount = fmt.Sprintf(" (%d/%d files)", currentFileIndex+1, len(changedFiles))
 				}
-				fmt.Printf("\r🤖 Claude is reviewing your changes %s%s%s ", spinner[i%len(spinner)], currentFile, fileCount)
+				fmt.Printf("\r🤖 Claude is reviewing your changes %s%s ", spinner[i%len(spinner)], currentFile)
 
 				// Clear to end of line to handle varying file name lengths
 				fmt.Print("\033[K")
