@@ -1,6 +1,6 @@
 # cc (Claude Commit)
 
-**Current Version:** v1.0.3
+**Current Version:** v1.0.4
 
 A CLI tool that uses Claude Code (Haiku) to review your code changes, generate commit messages, and push to your repository.
 
@@ -77,6 +77,13 @@ Shows the commit message and asks for your confirmation before committing and pu
 
 ✨ Done! Your changes have been reviewed, committed, and pushed.
 ```
+
+### Model Selection
+Check or change the Claude model used for reviews:
+```bash
+cc models
+```
+This will show the current model and allow you to select from available options (Haiku, Sonnet, Opus, etc.).
 
 ### Version Management
 Check your current version:

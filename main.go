@@ -12,17 +12,26 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/quaywin/claude-commit/internal/claude"
+	"github.com/quaywin/claude-commit/internal/config"
 	"github.com/quaywin/claude-commit/internal/git"
 )
 
-const VERSION = "v1.0.3"
+const VERSION = "v1.0.4"
 
 func main() {
+	// Load config
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Printf("⚠️  Warning: Could not load config: %v\n", err)
+		cfg = &config.Config{Model: "haiku"}
+	}
+
 	// Handle version command
 	if len(os.Args) > 1 && (os.Args[1] == "version" || os.Args[1] == "--version" || os.Args[1] == "-v") {
 		fmt.Printf("cc version %s\n", VERSION)
@@ -32,6 +41,12 @@ func main() {
 	// Handle update command
 	if len(os.Args) > 1 && os.Args[1] == "update" {
 		handleUpdate()
+		return
+	}
+
+	// Handle models command
+	if len(os.Args) > 1 && os.Args[1] == "models" {
+		handleModels(cfg)
 		return
 	}
 
@@ -98,7 +113,7 @@ func main() {
 		}
 	}()
 
-	result, err := claude.ReviewAndCommitMessage(diff, nil)
+	result, err := claude.ReviewAndCommitMessage(diff, cfg.Model, nil)
 
 	// Stop spinner
 	stopSpinner <- true
@@ -159,6 +174,71 @@ func main() {
 	}
 
 	fmt.Println("\n✨ Done! Your changes have been reviewed, committed, and pushed.")
+}
+
+func handleModels(cfg *config.Config) {
+	models := []string{
+		"haiku",
+		"sonnet",
+		"opus",
+	}
+
+	fmt.Printf("Current model: %s\n", cfg.Model)
+	fmt.Println("\nSelect a model:")
+
+	// Check if current model is in the list
+	found := false
+	for i, m := range models {
+		prefix := "  "
+		if m == cfg.Model {
+			prefix = "* "
+			found = true
+		}
+		fmt.Printf("%s%d. %s\n", prefix, i+1, m)
+	}
+
+	// Add custom option
+	customIdx := len(models) + 1
+	prefix := "  "
+	if !found {
+		prefix = "* "
+	}
+	fmt.Printf("%s%d. Custom...\n", prefix, customIdx)
+
+	fmt.Print("\nEnter number to select (or press Enter to keep current): ")
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+
+	if input == "" {
+		return
+	}
+
+	idx, err := strconv.Atoi(input)
+	if err != nil || idx < 1 || idx > customIdx {
+		fmt.Println("❌ Invalid selection")
+		return
+	}
+
+	if idx == customIdx {
+		fmt.Print("Enter custom model name: ")
+		customInput, _ := reader.ReadString('\n')
+		customInput = strings.TrimSpace(customInput)
+		if customInput == "" {
+			fmt.Println("❌ Model name cannot be empty")
+			return
+		}
+		cfg.Model = customInput
+	} else {
+		cfg.Model = models[idx-1]
+	}
+
+	if err := config.Save(cfg); err != nil {
+		fmt.Printf("❌ Error saving config: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("✅ Model set to: %s\n", cfg.Model)
 }
 
 type GithubRelease struct {
