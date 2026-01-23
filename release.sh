@@ -7,7 +7,7 @@
 set -e
 
 APP_NAME="cc"
-PLATFORMS=("darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
+PLATFORMS=("darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64" "windows/amd64" "windows/arm64")
 
 # Check for gh CLI
 if ! command -v gh &> /dev/null; then
@@ -52,9 +52,20 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     ARCH=${PLATFORM#*/}
     OUTPUT_NAME="dist/${APP_NAME}-${OS}-${ARCH}"
 
+    # Add .exe extension for Windows
+    if [ "$OS" = "windows" ]; then
+        OUTPUT_NAME="${OUTPUT_NAME}.exe"
+    fi
+
     echo "🔨 Building for $OS/$ARCH..."
     GOOS=$OS GOARCH=$ARCH go build -o "$OUTPUT_NAME" main.go
 done
+
+# Generate checksums
+echo "🔐 Generating checksums..."
+cd dist
+shasum -a 256 cc-* > checksums.txt
+cd ..
 
 # 2. Update README.md version
 echo "📝 Updating README.md to version $VERSION..."
@@ -64,6 +75,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     sed -i '' "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
 else
     sed -i "s/\*\*Current Version:\*\*.*/\*\*Current Version:\*\* $VERSION/" README.md
+fi
+
+# 3. Update VERSION constant in main.go
+echo "📝 Updating VERSION in main.go to $VERSION..."
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/const VERSION = \".*\"/const VERSION = \"$VERSION\"/" main.go
+else
+    sed -i "s/const VERSION = \".*\"/const VERSION = \"$VERSION\"/" main.go
 fi
 
 # 4. Generate Changelog

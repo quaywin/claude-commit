@@ -1,6 +1,6 @@
 # cc (Claude Commit)
 
-**Current Version:** v1.0.1
+**Current Version:** v1.0.2
 
 A CLI tool that uses Claude Code (Haiku) to review your code changes, generate commit messages, and push to your repository.
 
@@ -9,6 +9,7 @@ A CLI tool that uses Claude Code (Haiku) to review your code changes, generate c
 - **Auto-Commit Messages**: Generates professional commit messages based on your diff.
 - **Clean History**: Automatically forbids Claude from adding "Co-Authored-By" or other attribution trailers to your commits.
 - **One-Step Workflow**: Handles `git add`, `git commit`, and `git push` in one go.
+- **Plan Mode**: Optional confirmation mode to review before committing.
 
 ## Installation
 
@@ -25,9 +26,69 @@ cd claude-commit
 ```
 
 ## Usage
-Run the following command in any git repository:
+
+### Basic Usage
+
+**Quick mode (auto-commit):**
 ```bash
 cc
+```
+Automatically reviews, generates commit message, and pushes without confirmation.
+
+**Plan mode (with confirmation):**
+```bash
+cc plan
+```
+Shows the commit message and asks for your confirmation before committing and pushing.
+
+#### Quick Mode Example:
+```
+🔍 Checking for changes...
+🤖 Claude is reviewing your changes ⠋
+```
+(Animated spinner while Claude analyzes your code)
+```
+🤖 Claude is reviewing your changes... ✅
+
+📝 Commit message: feat: add user authentication with JWT tokens
+
+🚀 Staging all changes...
+💾 Committing...
+📤 Pushing...
+
+✨ Done! Your changes have been reviewed, committed, and pushed.
+```
+
+#### Plan Mode Example:
+```
+🔍 Checking for changes...
+🤖 Claude is reviewing your changes ⠋
+```
+(Animated spinner while Claude analyzes your code)
+```
+🤖 Claude is reviewing your changes... ✅
+
+📝 Commit message: feat: add user authentication with JWT tokens
+
+❓ Do you want to commit and push these changes? (y/n): y
+🚀 Staging all changes...
+💾 Committing...
+📤 Pushing...
+
+✨ Done! Your changes have been reviewed, committed, and pushed.
+```
+
+### Version Management
+Check your current version:
+```bash
+cc version
+# or
+cc --version
+```
+
+Update to the latest version:
+```bash
+cc update
 ```
 
 ## Requirements
