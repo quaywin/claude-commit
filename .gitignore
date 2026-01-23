@@ -15,4 +15,4 @@ vendor/
 .vscode/
 .idea/
 .DS_Store
-.claude/
+.claude/settings.local.json
