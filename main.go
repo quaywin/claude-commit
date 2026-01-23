@@ -51,7 +51,16 @@ func main() {
 	}
 
 	// Check if plan mode (with confirmation)
-	planMode := len(os.Args) > 1 && os.Args[1] == "plan"
+	planMode := false
+	forceMode := false
+	for _, arg := range os.Args[1:] {
+		if arg == "plan" {
+			planMode = true
+		}
+		if arg == "--force" || arg == "-f" {
+			forceMode = true
+		}
+	}
 
 	fmt.Println("🔍 Checking for changes...")
 
@@ -146,8 +155,32 @@ func main() {
 	if strings.HasPrefix(strings.ToUpper(result), "ISSUE:") {
 		fmt.Println("\n⚠️  Claude found potential issues in your code:")
 		fmt.Println(result)
-		fmt.Println("\nPlease fix these issues before committing.")
-		os.Exit(1)
+
+		if !forceMode {
+			fmt.Println("\nPlease fix these issues before committing. Use --force or -f to commit anyway.")
+			os.Exit(1)
+		} else {
+			fmt.Println("\n⚠️  Force mode enabled. Proceeding with commit despite issues.")
+			// Remove the ISSUE: prefix for the commit message if we're forcing
+			lines := strings.Split(result, "\n")
+			if len(lines) > 0 {
+				// Try to find a line that doesn't start with ISSUE: or use a default message
+				// Usually, Claude output for ISSUE: looks like:
+				// ISSUE: <description>
+				// Suggested message: <message>
+				foundMessage := false
+				for _, line := range lines {
+					if strings.HasPrefix(strings.ToLower(line), "suggested message:") || strings.HasPrefix(strings.ToLower(line), "commit message:") {
+						result = strings.TrimSpace(strings.SplitN(line, ":", 2)[1])
+						foundMessage = true
+						break
+					}
+				}
+				if !foundMessage {
+					result = "chore: commit despite potential issues"
+				}
+			}
+		}
 	}
 
 	// 4. Show commit message
