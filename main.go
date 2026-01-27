@@ -55,14 +55,21 @@ func main() {
 	forceMode := false
 	noPush := false
 	for _, arg := range os.Args[1:] {
-		if arg == "plan" {
+		switch arg {
+		case "plan":
 			planMode = true
-		}
-		if arg == "--force" || arg == "-f" {
+		case "--force", "-f":
 			forceMode = true
-		}
-		if arg == "--no-push" {
+		case "--no-push":
 			noPush = true
+		case "version", "--version", "-v", "update", "models":
+			// These are handled by early returns at the beginning of main()
+			// but we include them here to avoid "Unknown parameter" errors
+			continue
+		default:
+			fmt.Printf("❌ Error: Unknown parameter: %s\n", arg)
+			fmt.Println("Usage: cc [plan] [--force|-f] [--no-push] [version|--version|-v] [update] [models]")
+			os.Exit(1)
 		}
 	}
 
