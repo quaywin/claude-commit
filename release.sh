@@ -43,7 +43,21 @@ fi
 
 CUSTOM_NOTES="$2"
 
-# 1. Build Binaries
+# 1. Update Version in main.go
+echo "🏷️ Updating version in main.go to $VERSION..."
+# Use sed to replace the VERSION constant in main.go
+# Using a temp file for cross-platform compatibility with sed -i
+sed "s/const VERSION = \".*\"/const VERSION = \"$VERSION\"/" main.go > main.go.tmp && mv main.go.tmp main.go
+
+# Commit the version bump if there are changes
+if ! git diff --quiet main.go; then
+    echo "💾 Committing version bump..."
+    git add main.go
+    git commit -m "chore: bump version to $VERSION"
+    git push origin main
+fi
+
+# 2. Build Binaries
 echo "📦 Building releases for $VERSION..."
 mkdir -p dist
 

@@ -22,7 +22,7 @@ import (
 	"github.com/quaywin/claude-commit/internal/git"
 )
 
-const VERSION = "v1.0.6"
+const VERSION = "v1.0.10"
 
 func main() {
 	// Load config
@@ -510,13 +510,30 @@ del "%%~f0"
 
 	// Replace current binary (Unix-like systems)
 	fmt.Println("🚚 Installing update...")
-	if err := os.Rename(tmpPath, exePath); err != nil {
-		// If rename fails (cross-device link), try copy
+
+	// On Unix, we can't always rename/overwrite a running binary
+	// The safest way is to rename the OLD binary and then put the NEW one in its place
+	oldPath := exePath + ".old"
+	if err := os.Rename(exePath, oldPath); err != nil {
+		// If rename fails (might not have permission), try copy then rename
 		if err := copyFile(tmpPath, exePath); err != nil {
 			fmt.Printf("❌ Error replacing binary: %v\n", err)
 			fmt.Println("💡 You may need to run with sudo: sudo cc update")
 			os.Exit(1)
 		}
+	} else {
+		// Moved old binary to .old, now move new binary to original path
+		if err := os.Rename(tmpPath, exePath); err != nil {
+			// If rename fails (might be cross-device link), try copy
+			if err := copyFile(tmpPath, exePath); err != nil {
+				// If copying new binary fails, try to restore old one
+				os.Rename(oldPath, exePath)
+				fmt.Printf("❌ Error installing new binary: %v\n", err)
+				os.Exit(1)
+			}
+		}
+		// Successfully installed new binary, remove the .old one
+		os.Remove(oldPath)
 	}
 
 	fmt.Printf("✅ Updated to %s successfully!\n", latestVersion)
