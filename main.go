@@ -53,12 +53,16 @@ func main() {
 	// Check if plan mode (with confirmation)
 	planMode := false
 	forceMode := false
+	noPush := false
 	for _, arg := range os.Args[1:] {
 		if arg == "plan" {
 			planMode = true
 		}
 		if arg == "--force" || arg == "-f" {
 			forceMode = true
+		}
+		if arg == "--no-push" {
+			noPush = true
 		}
 	}
 
@@ -216,13 +220,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("📤 Pushing...")
-	if err := git.Push(); err != nil {
-		fmt.Printf("❌ Error pushing: %v\n", err)
-		os.Exit(1)
+	if !noPush {
+		fmt.Println("📤 Pushing...")
+		if err := git.Push(); err != nil {
+			fmt.Printf("❌ Error pushing: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("\n✨ Done! Your changes have been reviewed, committed, and pushed.")
+	} else {
+		fmt.Println("\n✨ Done! Your changes have been reviewed and committed (not pushed).")
 	}
-
-	fmt.Println("\n✨ Done! Your changes have been reviewed, committed, and pushed.")
 }
 
 func handleModels(cfg *config.Config) {
