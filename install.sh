@@ -6,7 +6,13 @@
 set -e
 
 APP_NAME="cc"
-INSTALL_DIR="/usr/local/bin"
+# Detect preferred installation directory
+if [ -d "$HOME/.local/bin" ]; then
+    INSTALL_DIR="$HOME/.local/bin"
+else
+    INSTALL_DIR="/usr/local/bin"
+fi
+
 REPO_URL="github.com/quaywin/claude-commit" # Update this to your repo
 VERSION="latest"
 
@@ -56,4 +62,12 @@ else
 fi
 
 echo "✅ $APP_NAME installed successfully!"
+
+# Check if INSTALL_DIR is in PATH
+if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+    echo "⚠️  Warning: $INSTALL_DIR is not in your PATH."
+    echo "To add it, add the following line to your shell profile (~/.zshrc, ~/.bashrc, etc.):"
+    echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
+fi
+
 echo "Run 'cc' in any git repo to start."
